@@ -3,6 +3,8 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as cryptoJS from 'crypto-js';
 import { SeguridadService } from 'src/app/servicios/seguridad.service';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-login',
@@ -13,7 +15,7 @@ export class LoginComponent implements OnInit {
 
   fgValidacion = this.fb.group({
     correo: ['', [Validators.required, Validators.email]],
-    clave: ['', [Validators.required]]
+    clave: ['', [Validators.required, Validators.minLength(3)]]
   });
 
   constructor(private fb:FormBuilder,private seguridadService: SeguridadService,
@@ -28,12 +30,23 @@ export class LoginComponent implements OnInit {
  
     this.seguridadService.login(usuario, claveCifrada).subscribe(
       (data: any) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Bienvenido',
+          showConfirmButton: false,
+          timer: 1500
+        })
         this.seguridadService.almacenarSesion(data)
         this.router.navigate(['/index']);
       },
       (error: any) => {
         console.log(error)
-        alert("Datos inválidos");
+        //alert("Datos inválidos");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Datos invalidos'
+        })
       }
       );
     }
